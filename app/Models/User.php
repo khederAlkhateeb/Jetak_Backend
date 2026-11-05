@@ -17,7 +17,7 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable,HasRoles,HasApiTokens;
+    use HasFactory, Notifiable, HasRoles, HasApiTokens;
 
     /**
      * Get the attributes that should be cast.
@@ -34,7 +34,7 @@ class User extends Authenticatable
 
 
     protected string $guard_name = 'api';
-    
+
 
     public function notifications()
     {
@@ -89,5 +89,9 @@ class User extends Authenticatable
     public function receivedReviews()
     {
         return $this->hasMany(Review::class, 'provider_id');
+    }
+    public function getRole(): ?string
+    {
+        return $this->getRoleNames()->first();
     }
 }

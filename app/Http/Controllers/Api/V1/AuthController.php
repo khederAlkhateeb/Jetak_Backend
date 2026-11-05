@@ -12,6 +12,7 @@ use App\Actions\V1\Authentication\LogoutUserAction;
 use App\Actions\V1\Authentication\MeUserAction;
 use App\Actions\V1\Authentication\ChangePasswordAction;
 use App\Http\Requests\Api\Auth\ChangePasswordRequest;
+use App\Http\Resources\V1\UserResource;
 
 
 /**
@@ -53,7 +54,7 @@ class AuthController extends Controller
 
         return $this->successResponse(
             data: [
-                'user' => $result['user'],
+                'user' => new UserResource($result['user']),
                 'token' => $result['token'],
             ],
             message: 'Logged in successfully',
