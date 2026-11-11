@@ -112,7 +112,7 @@ class AuthController extends Controller
 
         return $this->successResponse(
             data: [
-                'user' => $user,
+                'user' => new UserResource($user)
             ],
             message: 'User retrieved successfully',
             code: 200

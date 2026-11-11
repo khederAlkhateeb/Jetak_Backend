@@ -19,6 +19,11 @@ class UserResource extends JsonResource
             'floor'           => $this->floor,
             'room_number'     => $this->room_number,
             'role'            => $this->getRole(),
+
+            'wallet'              => $this->whenLoaded('wallet'),
+            'bread_subscriptions' => $this->whenLoaded('breadSubscriptions'),
+            'bookings'            => $this->whenLoaded('bookings'),
+
             'created_at'      => $this->created_at,
         ];
     }
