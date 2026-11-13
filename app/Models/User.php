@@ -11,9 +11,14 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Laravel\Sanctum\HasApiTokens;
+use App\Builders\UserBuilder;
+use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
 
 #[Fillable(['name', 'email', 'password', 'phone', 'status', 'building_number', 'floor', 'room_number'])]
 #[Hidden(['password', 'remember_token'])]
+#[UseEloquentBuilder(UserBuilder::class)]
+
+
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */

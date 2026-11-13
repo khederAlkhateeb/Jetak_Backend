@@ -50,6 +50,11 @@ class RegisterUserAction
             ]);
 
             $user->assignRole('Student'); // Assign the "user" role to the newly registered user
+
+            $user->wallet()->create([
+                'balance' => 0.00,
+            ]);
+            
             $token = $user->createToken('auth_token')->plainTextToken;
 
             return [
