@@ -72,5 +72,21 @@ class UserSeeder extends Seeder
             ]
         );
         $student->assignRole('Student');
+
+        $student->wallet()->create([
+                'balance' => 0.00,
+        ]);
+        $delivery->wallet()->create([
+                'balance' => 0.00,
+        ]);
+        $hallAdmin->wallet()->create([
+                'balance' => 0.00,
+        ]);
+        $storeAdmin->wallet()->create([
+                'balance' => 0.00,
+        ]);
+         $superAdmin->wallet()->create([
+                'balance' => 0.00,
+        ]);
     }
 }
