@@ -2,65 +2,105 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Models\Wallet;
-use Illuminate\Http\Request;
+use App\Actions\V1\Wallet\GetWalletBalanceAction;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\V1\Wallet\WalletBalanceResource;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use App\Http\Requests\Api\Wallet\ListWalletTransactionsRequest;
+use App\Http\Resources\V1\Wallet\WalletTransactionResource;
+use App\Actions\V1\Wallet\GetWalletTransactionsAction;
+use App\Actions\V1\SuperAdmin\DepositWalletAction;
+use App\Http\Requests\Api\SuperAdmin\DepositWalletRequest;
+use App\Actions\V1\SuperAdmin\WithdrawWalletAction;
+use App\Http\Requests\Api\SuperAdmin\WithdrawWalletRequest;
+
 
 class WalletController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
+    public function __construct(
+        private readonly GetWalletBalanceAction $getWalletBalanceAction,
+        private readonly GetWalletTransactionsAction $getWalletTransactionsAction,
+        private readonly DepositWalletAction $depositWalletAction,
+        private readonly WithdrawWalletAction $withdrawWalletAction,
+    ) {}
 
     /**
-     * Show the form for creating a new resource.
+     * Get the authenticated user balance
+     * @param Request $request
+     * @return JsonResponse
      */
-    public function create()
+    public function balance(Request $request): JsonResponse
     {
-        //
+        $wallet = $this->getWalletBalanceAction->execute($request->user());
+
+        return $this->successResponse(
+            data: [
+                'wallet' => new WalletBalanceResource($wallet),
+            ],
+            message: 'Wallet balance retrieved successfully',
+            code: 200
+        );
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+
 
     /**
-     * Display the specified resource.
+     * Get the authenticated user transactions
+     * @param ListWalletTransactionsRequest $request
+     * @return JsonResponse
      */
-    public function show(Wallet $wallet)
+    public function transactions(ListWalletTransactionsRequest $request)
     {
-        //
+        $transactions = $this->getWalletTransactionsAction->execute(
+            $request->user(),
+            $request->validated()
+        );
+
+        return $this->successResponse(
+            data: [
+                'transactions' => WalletTransactionResource::collection($transactions),
+            ],
+            message: 'Wallet transactions retrieved successfully',
+            code: 200
+        );
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Wallet $wallet)
-    {
-        //
-    }
 
     /**
-     * Update the specified resource in storage.
+     * Deposit an amount in to an account
+     * @param DepositWalletRequest $request
+     * @return JsonResponse
      */
-    public function update(Request $request, Wallet $wallet)
+    public function deposit(DepositWalletRequest $request): JsonResponse
     {
-        //
+        $wallet = $this->depositWalletAction->execute($request->validated());
+
+        return $this->successResponse(
+            data: [
+                'wallet' => new WalletBalanceResource($wallet),
+            ],
+            message: 'Wallet deposited successfully',
+            code: 201
+        );
     }
 
+
     /**
-     * Remove the specified resource from storage.
+     * Withdraw an amount from an account
+     * @param WithdrawWalletRequest $request
+     * @return JsonResponse
      */
-    public function destroy(Wallet $wallet)
+    public function withdraw(WithdrawWalletRequest $request): JsonResponse
     {
-        //
+        $wallet = $this->withdrawWalletAction->execute($request->validated());
+
+        return $this->successResponse(
+            data: [
+                'wallet' => new WalletBalanceResource($wallet),
+            ],
+            message: 'Wallet withdrawn successfully',
+            code: 200
+        );
     }
 }

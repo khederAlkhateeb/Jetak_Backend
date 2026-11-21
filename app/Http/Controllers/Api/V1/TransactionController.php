@@ -5,62 +5,52 @@ namespace App\Http\Controllers\Api\V1;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Actions\V1\SuperAdmin\GetAdminTransactionsAction;
+use App\Http\Requests\Api\SuperAdmin\ListAdminTransactionsRequest;
+use App\Http\Resources\SuperAdmin\AdminTransactionResource;
+use App\Actions\V1\SuperAdmin\GetAdminTransactionDetailsAction;
+use App\Http\Resources\SuperAdmin\AdminTransactionDetailsResource;
+
 
 class TransactionController extends Controller
 {
+    public function __construct(
+        private readonly GetAdminTransactionsAction $getAdminTransactionsAction,
+        private readonly GetAdminTransactionDetailsAction $getAdminTransactionDetailsAction,
+    ) {}
+
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function transactions(ListAdminTransactionsRequest $request)
     {
-        //
+        $transactions = $this->getAdminTransactionsAction->execute($request->validated());
+
+        return $this->successResponse(
+            data: AdminTransactionResource::collection($transactions),
+            message: 'Transactions retrieved successfully.',
+            meta: [
+                'current_page' => $transactions->currentPage(),
+                'last_page'    => $transactions->lastPage(),
+                'per_page'     => $transactions->perPage(),
+                'total'        => $transactions->total(),
+            ],
+            code: 200
+        );
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+    public function showTransaction(Transaction $transaction)
+{
+    $transactionDetails = $this->getAdminTransactionDetailsAction->execute($transaction);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Transaction $transaction)
-    {
-        //
-    }
+    return $this->successResponse(
+        data: [
+            'transaction' => new AdminTransactionDetailsResource($transactionDetails),
+        ],
+        message: 'Transaction details retrieved successfully',
+        code: 200
+    );
+}
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Transaction $transaction)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Transaction $transaction)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Transaction $transaction)
-    {
-        //
-    }
 }
