@@ -5,7 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\AdminUserController;
-
+use App\Http\Controllers\Api\V1\WalletController;
+use App\Http\Controllers\Api\V1\TransactionController;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
@@ -32,3 +33,26 @@ Route::middleware(['auth:sanctum', 'role:Super Admin'])
         Route::patch('/users/{user}/status', [AdminUserController::class, 'updateStatus']);
         Route::delete('/users/{user}', [AdminUserController::class, 'destroy']);
 });
+
+
+Route::middleware(['auth:sanctum'])
+    ->prefix('v1/wallet')
+    ->group(function () {
+        Route::get('/balance', [WalletController::class, 'balance']);
+        Route::get('/transactions', [WalletController::class, 'transactions']);
+    });
+
+Route::middleware(['auth:sanctum', 'role:Super Admin'])
+    ->prefix('v1/wallet')
+    ->group(function () {
+        Route::post('/deposit', [WalletController::class, 'deposit']);
+        Route::post('/withdraw', [WalletController::class, 'withdraw']);
+    });
+
+
+Route::middleware(['auth:sanctum', 'role:Super Admin'])
+    ->prefix('v1/transactions')
+    ->group(function () {
+        Route::get('/', [TransactionController::class, 'transactions']);
+        Route::get('/{transaction}', [TransactionController::class, 'showTransaction']);
+    });
